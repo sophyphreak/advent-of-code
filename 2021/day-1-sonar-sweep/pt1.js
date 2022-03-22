@@ -13,11 +13,11 @@ const getInput = async () => {
 
 const doTheThing = async () => {
   const input = await getInput()
-  const arr = input.split("\n").map(str => +str)
+  const depths = input.split("\n").map(str => +str)
 
   let increases = 0
-  for (let i = 0; i < arr.length - 1; i++) {
-    if (arr[i] < arr[i + 1]) {
+  for (let i = 0; i < depths.length - 1; i++) {
+    if (depths[i] < depths[i + 1]) {
       increases++
     }
   }

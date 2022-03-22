@@ -13,15 +13,15 @@ const getInput = async () => {
 
 const doTheThing = async () => {
   const input = await getInput()
-  const arr = input.split("\n").map(str => +str)
+  const depths = input.split("\n").map(str => +str)
 
-  let previousWindowSum = arr[0] + arr[1] + arr[2]
+  let previousWindowSum = depths[0] + depths[1] + depths[2]
   let currentWindowSum = previousWindowSum
 
   let increases = 0
-  for (let i = 1; i < arr.length - 2; i++) {
-    currentWindowSum -= arr[i - 1]
-    currentWindowSum += arr[i + 2]
+  for (let i = 1; i < depths.length - 2; i++) {
+    currentWindowSum -= depths[i - 1]
+    currentWindowSum += depths[i + 2]
     if (previousWindowSum < currentWindowSum) {
       increases++
     }
