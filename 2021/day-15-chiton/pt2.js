@@ -150,7 +150,7 @@ const getDistanceFromStartToEnd = (chitonGraph, queue, endPoint) => {
   return chitonGraph[endPoint].distance
 }
 
-const doTheThing = async (getArr, steps) => {
+const doTheThing = async getArr => {
   const chitonMatrix = await getArr()
   const biggerChitronMatrix = buildBiggerChitronMatrix(chitonMatrix)
   const chitronGraph = convertMatrixIntoGraph(biggerChitronMatrix)
