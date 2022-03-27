@@ -42,7 +42,7 @@ class Node {
 class PriorityQueue {
   constructor() {
     this.nodes = []
-    this.nodeDistances = []
+    this.nodeDistances = [] // for debugging
   }
   enqueue(enqueuedNodeLocationStr, chitonGraph) {
     const enqueuedNode = chitonGraph[enqueuedNodeLocationStr]
@@ -93,8 +93,6 @@ const buildBiggerChitronMatrix = chitonMatrix => {
       biggerChitronMatrix[i][j] = value
     }
   }
-  // const printable = biggerChitronMatrix.map(arr => arr.join("")).join("\n")
-  // console.log(printable)
   return biggerChitronMatrix
 }
 

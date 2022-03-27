@@ -42,7 +42,7 @@ class Node {
 class PriorityQueue {
   constructor() {
     this.nodes = []
-    this.nodeDistances = []
+    this.nodeDistances = [] // for debugging
   }
   enqueue(enqueuedNodeLocationStr, chitonGraph) {
     const enqueuedNode = chitonGraph[enqueuedNodeLocationStr]
@@ -138,14 +138,6 @@ const doTheThing = async (getArr, steps) => {
   queue.enqueue(`0_0`, chitronGraph)
   const endPoint = `${chitonMatrix.length - 1}_${chitonMatrix[0].length - 1}`
   const distance = getDistanceFromStartToEnd(chitronGraph, queue, endPoint)
-  // while currentNode !== endNode
-  //  update neighbor nodes' distances from startNode
-  //  if you update a distance, enqueue it
-  // let currentNode = chitronGraph[endPoint]
-  // while (currentNode.parent) {
-  //   console.log(currentNode.locationStr, ":", currentNode.value)
-  //   currentNode = chitronGraph[currentNode.parent]
-  // }
   return distance
 }
 
