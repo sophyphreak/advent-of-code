@@ -48,16 +48,6 @@ const executeStep = (polymer, rules) => {
   return polymer
 }
 
-const printPolymer = polymer => {
-  const arr = []
-  let current = polymer
-  while (current != null) {
-    arr.push(current.value)
-    current = current.next
-  }
-  console.log(arr.join(""))
-}
-
 const countElementQuantities = polymer => {
   const counts = {}
   let current = polymer
@@ -68,23 +58,9 @@ const countElementQuantities = polymer => {
     counts[current.value]++
     current = current.next
   }
-  console.log(counts)
   const mostCommonElementQuantity = Math.max(...Object.values(counts))
   const leastCommonElementQuantity = Math.min(...Object.values(counts))
   return { mostCommonElementQuantity, leastCommonElementQuantity }
-}
-
-const buildState = polymer => {
-  const state = {}
-  let current = polymer
-  while (current.next) {
-    if (!(current.value + current.next.value in state)) {
-      state[current.value + current.next.value] = 0
-    }
-    state[current.value + current.next.value] += 1
-    current = current.next
-  }
-  return state
 }
 
 const doTheThing = async (getArr, steps) => {
@@ -94,36 +70,34 @@ const doTheThing = async (getArr, steps) => {
   for (let i = 0; i < steps; i++) {
     polymer = executeStep(polymer, rules)
   }
-  // printPolymer(polymer)
-  console.log(buildState(polymer))
   const { mostCommonElementQuantity, leastCommonElementQuantity } =
     countElementQuantities(polymer)
   return mostCommonElementQuantity - leastCommonElementQuantity
 }
 
-// doTheThing(
-//   () =>
-//     Promise.resolve([
-//       "NNCB",
-//       "",
-//       "CH -> B",
-//       "HH -> N",
-//       "CB -> H",
-//       "NH -> C",
-//       "HB -> C",
-//       "HC -> B",
-//       "HN -> C",
-//       "NN -> C",
-//       "BH -> H",
-//       "NC -> B",
-//       "NB -> B",
-//       "BN -> B",
-//       "BB -> N",
-//       "BC -> B",
-//       "CC -> N",
-//       "CN -> C",
-//     ]),
-//   10
-// ).then(console.log)
+doTheThing(
+  () =>
+    Promise.resolve([
+      "NNCB",
+      "",
+      "CH -> B",
+      "HH -> N",
+      "CB -> H",
+      "NH -> C",
+      "HB -> C",
+      "HC -> B",
+      "HN -> C",
+      "NN -> C",
+      "BH -> H",
+      "NC -> B",
+      "NB -> B",
+      "BN -> B",
+      "BB -> N",
+      "BC -> B",
+      "CC -> N",
+      "CN -> C",
+    ]),
+  10
+).then(console.log)
 
 doTheThing(getInput, 10).then(console.log)

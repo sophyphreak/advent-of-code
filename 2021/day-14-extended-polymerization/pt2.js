@@ -16,7 +16,10 @@ const getInput = async () => {
 const buildState = str => {
   const state = {}
   for (let i = 0; i < str.length - 1; i++) {
-    state[str.slice(i, i + 2)] = 1
+    if (!(str.slice(i, i + 2) in state)) {
+      state[str.slice(i, i + 2)] = 0
+    }
+    state[str.slice(i, i + 2)] += 1
   }
   return state
 }
@@ -59,10 +62,9 @@ const countElementQuantities = (state, lastLetter) => {
     counts[pair[0]] += state[pair]
   }
   for (const char in counts) {
-    counts[char] = Math.floor(counts[char] / 2) // round down for characters on the far left and right ends
+    counts[char] = Math.floor(counts[char] / 2) // round down for character on the far left end
   }
-  counts[lastLetter]++
-  console.log(counts)
+  counts[lastLetter]++ // increment last letter because one is missing
   const mostCommonElementQuantity = Math.max(...Object.values(counts))
   const leastCommonElementQuantity = Math.min(...Object.values(counts))
   return { mostCommonElementQuantity, leastCommonElementQuantity }
@@ -73,10 +75,8 @@ const doTheThing = async (getArr, steps) => {
   let state = buildState(arr[0])
   const rules = buildRules(arr.slice(2))
   for (let i = 0; i < steps; i++) {
-    // console.log("Step:", i, "/", steps)
     state = executeStep(state, rules)
   }
-  // console.log(state)
   const lastLetter = arr[0][arr[0].length - 1]
   const { mostCommonElementQuantity, leastCommonElementQuantity } =
     countElementQuantities(state, lastLetter)
@@ -108,4 +108,4 @@ doTheThing(
   40
 ).then(console.log)
 
-doTheThing(getInput, 10).then(console.log)
+doTheThing(getInput, 40).then(console.log)
