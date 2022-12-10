@@ -3,7 +3,7 @@ const axios = require("axios").default
 
 const getInput = async () => {
   const { data } = await axios.get(
-    "https://adventofcode.com/2022/day/9/input",
+    "https://adventofcode.com/2022/day/10/input",
     {
       headers: { Cookie: `session=${process.env.SESSION}` },
     }
@@ -11,145 +11,223 @@ const getInput = async () => {
   return data.slice(0, data.length - 1).split("\n")
 }
 
-const coord = (row, col) => `${row}_${col}`
-
-const calculateHeadTail = ({ currentHead, currentTail, been }) => {
-  while (
-    Math.abs(currentHead[0] - currentTail[0]) > 1 ||
-    Math.abs(currentHead[1] - currentTail[1]) > 1
-  ) {
-    // diagonal
-    if (
-      Math.abs(currentHead[0] - currentTail[0]) >= 1 &&
-      Math.abs(currentHead[1] - currentTail[1]) >= 1
-    ) {
-      if (currentTail[0] < currentHead[0]) {
-        currentTail[0]++
-      } else {
-        currentTail[0]--
-      }
-      if (currentTail[1] < currentHead[1]) {
-        currentTail[1]++
-      } else {
-        currentTail[1]--
-      }
-      been.add(coord(...currentTail))
-      continue
-    }
-
-    while (currentTail[0] < currentHead[0] - 1) {
-      currentTail[0]++
-      been.add(coord(...currentTail))
-    }
-    while (currentTail[0] > currentHead[0] + 1) {
-      currentTail[0]--
-      been.add(coord(...currentTail))
-    }
-    while (currentTail[1] < currentHead[1] - 1) {
-      currentTail[1]++
-      been.add(coord(...currentTail))
-    }
-    while (currentTail[1] > currentHead[1] + 1) {
-      currentTail[1]--
-      been.add(coord(...currentTail))
-    }
-  }
-
-  return { currentTail, currentHead, been }
-}
-
-const printChain = chain => {
-  const map = new Array(21).fill(0).map(_ => new Array(26).fill("."))
-  for (let i = 0; i < 10; i++) {
-    const rowIndex = chain[i][0]
-    const colIndex = chain[i][1]
-    if (map[rowIndex + 15][colIndex + 11] === ".")
-      map[rowIndex + 15][colIndex + 11] = i === 0 ? "H" : `${i}`
-  }
-  console.log(map.map(a => a.join("")).join("\n"))
-  console.log("")
-}
-
 const doTheThing = async getArr => {
+  let answerArr = []
+  const answer = new Array(6).fill(null).map(_ => new Array(40).fill(null))
   let arr = await getArr()
-  let currentChain = new Array(10).fill(0).map(_ => [0, 0])
-  let been = new Set([coord(0, 0)])
-  for (const row of arr) {
-    let [direction, distance] = row.split(" ").map(v => {
-      if ("RLUD".includes(v)) return v
-      return +v
-    })
+  let cycle = 0
+  let x = 1
+  let sum = 0
+  let addValue = null
+  let cyclesWithAddValue = 0
+  let index = -1
+  let getNewOrder = true
+  let order = null
+  while (true) {
+    cycle++
+    // start of cycle
+    if (getNewOrder) {
+      index++
+      if (index === arr.length) break
+      order = arr[index]
+      getNewOrder = false
 
-    while (distance) {
-      if (direction === "U") {
-        currentChain[0][0]--
+      if (order === "noop") {
+        getNewOrder = true
+      } else {
+        ;[addValue] = order
+          .split(" ")
+          .slice(1)
+          .map(s => +s)
       }
-      if (direction === "R") {
-        currentChain[0][1]++
-      }
-      if (direction === "D") {
-        currentChain[0][0]++
-      }
-      if (direction === "L") {
-        currentChain[0][1]--
-      }
-      distance--
-
-      for (let i = 0; i < 8; i++) {
-        let currentHead = currentChain[i]
-        let currentTail = currentChain[i + 1]
-        ;({ currentHead, currentTail } = calculateHeadTail({
-          currentHead,
-          currentTail,
-          been: new Set(),
-        }))
-        currentChain[i] = currentHead
-        currentChain[i + 1] = currentTail
-      }
-
-      let currentHead = currentChain[8]
-      let currentTail = currentChain[9]
-      ;({ currentHead, currentTail, been } = calculateHeadTail({
-        currentHead,
-        currentTail,
-        been,
-      }))
-      currentChain[8] = currentHead
-      currentChain[9] = currentTail
     }
-    // printChain(currentChain)
+
+    // during cycle
+    const position = (cycle - 1) % 40
+    if (Math.abs(position - x) <= 1) {
+      answerArr.push(true)
+    } else {
+      answerArr.push(false)
+    }
+
+    // cycle finishes
+    if (cyclesWithAddValue) {
+      x += addValue
+      addValue = null
+      cyclesWithAddValue = 0
+      getNewOrder = true
+    } else if (addValue) {
+      cyclesWithAddValue++
+    }
   }
-  return been.size
+  for (let i = 0; i < answer.length; i++) {
+    for (let j = 0; j < answer[0].length; j++) {
+      answer[i][j] = answerArr.shift()
+    }
+  }
+  return answer.map(a => a.map(b => (b ? "#" : ".")).join("")).join("\n") + "\n"
 }
 
+// doTheThing(() =>
+//   Promise.resolve(
+//     `noop
+//     addx 3
+//     addx -5`
+//       .split("\n")
+//       .map(r => r.trim())
+//   )
+// ).then(console.log)
+
 doTheThing(() =>
   Promise.resolve(
-    `R 4
-    U 4
-    L 3
-    D 1
-    R 4
-    D 1
-    L 5
-    R 2`
+    `addx 15
+    addx -11
+    addx 6
+    addx -3
+    addx 5
+    addx -1
+    addx -8
+    addx 13
+    addx 4
+    noop
+    addx -1
+    addx 5
+    addx -1
+    addx 5
+    addx -1
+    addx 5
+    addx -1
+    addx 5
+    addx -1
+    addx -35
+    addx 1
+    addx 24
+    addx -19
+    addx 1
+    addx 16
+    addx -11
+    noop
+    noop
+    addx 21
+    addx -15
+    noop
+    noop
+    addx -3
+    addx 9
+    addx 1
+    addx -3
+    addx 8
+    addx 1
+    addx 5
+    noop
+    noop
+    noop
+    noop
+    noop
+    addx -36
+    noop
+    addx 1
+    addx 7
+    noop
+    noop
+    noop
+    addx 2
+    addx 6
+    noop
+    noop
+    noop
+    noop
+    noop
+    addx 1
+    noop
+    noop
+    addx 7
+    addx 1
+    noop
+    addx -13
+    addx 13
+    addx 7
+    noop
+    addx 1
+    addx -33
+    noop
+    noop
+    noop
+    addx 2
+    noop
+    noop
+    noop
+    addx 8
+    noop
+    addx -1
+    addx 2
+    addx 1
+    noop
+    addx 17
+    addx -9
+    addx 1
+    addx 1
+    addx -3
+    addx 11
+    noop
+    noop
+    addx 1
+    noop
+    addx 1
+    noop
+    noop
+    addx -13
+    addx -19
+    addx 1
+    addx 3
+    addx 26
+    addx -30
+    addx 12
+    addx -1
+    addx 3
+    addx 1
+    noop
+    noop
+    noop
+    addx -9
+    addx 18
+    addx 1
+    addx 2
+    noop
+    noop
+    addx 9
+    noop
+    noop
+    noop
+    addx -1
+    addx 2
+    addx -37
+    addx 1
+    addx 3
+    noop
+    addx 15
+    addx -21
+    addx 22
+    addx -6
+    addx 1
+    noop
+    addx 2
+    addx 1
+    noop
+    addx -10
+    noop
+    noop
+    addx 20
+    addx 1
+    addx 2
+    addx 2
+    addx -6
+    addx -11
+    noop
+    noop
+    noop`
       .split("\n")
       .map(r => r.trim())
   )
 ).then(console.log)
-
-doTheThing(() =>
-  Promise.resolve(
-    `R 5
-    U 8
-    L 8
-    D 3
-    R 17
-    D 10
-    L 25
-    U 20`
-      .split("\n")
-      .map(r => r.trim())
-  )
-).then(console.log)
-
 doTheThing(getInput).then(console.log)
