@@ -45,4 +45,4 @@ doTheThing(() =>
   ])
 ).then(console.log)
 
-doTheThing(getInput).then(console.log)
+// doTheThing(getInput).then(console.log)
